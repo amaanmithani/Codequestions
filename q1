@@ -1,0 +1,44 @@
+with open("inputs/15.txt", "r") as file:
+    inputs = file.read().split(",")
+
+
+def hash(string):
+    current_value = 0
+    for char in string:
+        current_value += ord(char)
+        current_value *= 17
+        current_value %= 256
+    return current_value
+
+
+solution1 = sum(map(hash, inputs))
+print(f"Solution 1: ", solution1)
+
+boxes = [[] for _ in range(256)]
+focal_lengths = {}
+for step in inputs:
+    if "=" in step:
+        label, focal_length = step.split("=")
+        focal_length = int(focal_length)
+        box = hash(label)
+        focal_lengths[label] = focal_length
+        if label in boxes[box]:
+            label_index = boxes[box].index(label)
+            boxes[box][label_index] = label
+
+        else:
+            boxes[box].append(label)
+
+    if "-" in step:
+        label = step[:-1]
+        box = hash(label)
+        if label in boxes[box]:
+            boxes[box].remove(label)
+
+
+solution2 = 0
+for box_index, box in enumerate(boxes, start=1):
+    for slot_index, label in enumerate(box, start=1):
+        solution2 += box_index * slot_index * focal_lengths[label]
+
+print(f"Solution 2: ", solution2)
